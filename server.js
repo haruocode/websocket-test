@@ -1,12 +1,28 @@
-// server.js
 const WebSocket = require('ws');
 
 const server = new WebSocket.Server({ port: 8080 });
 
+setInterval(() => {
+  server.clients.forEach((ws) => {
+    if (ws.isAlive === false) {
+      console.log(`切断: 応答なし(${ws.nickname || '名無し'})`);
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, 30000);
+
 server.on('connection', (socket) => {
   console.log('クライアント接続！');
-
+  socket.isAlive = true;
   socket.nickname = '名無し';
+
+  socket.on('pong', () => {
+    console.log(`${socket.nickname} is ALIVE`)
+    socket.isAlive = true;
+  });
 
   socket.on('message', (data) => {
     const message = data.toString();
