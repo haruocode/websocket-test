@@ -2,13 +2,21 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>WebSocketテスト</title>
+  <title>WebSocketチャット</title>
 </head>
 <body>
-  <h1>WebSocketテスト</h1>
-  <input id="messageInput" type="text" placeholder="メッセージ入力">
-  <button onclick="sendMessage()">送信</button>
-  <div id="log"></div>
+  <h1>WebSocketチャット</h1>
+
+  <div id="nicknameArea">
+    <input id="nicknameInput" type="text" placeholder="ニックネームを入力">
+    <button onclick="registerNickname()">ニックネーム登録</button>
+  </div>
+
+  <div id="chatArea" style="display:none;">
+    <input id="messageInput" type="text" placeholder="メッセージ入力">
+    <button onclick="sendMessage()">送信</button>
+    <div id="log"></div>
+  </div>
 
   <script>
     const socket = new WebSocket('ws://localhost:8080');
@@ -18,13 +26,23 @@
     });
 
     socket.addEventListener('message', (event) => {
-      log('受信: ' + event.data);
+      log(event.data);
     });
+
+    function registerNickname() {
+      const nickname = document.getElementById('nicknameInput').value;
+      if (nickname.trim() === '') {
+        alert('ニックネームを入力してください');
+        return;
+      }
+      socket.send('NICKNAME:' + nickname);
+      document.getElementById('nicknameArea').style.display = 'none';
+      document.getElementById('chatArea').style.display = 'block';
+    }
 
     function sendMessage() {
       const input = document.getElementById('messageInput');
       socket.send(input.value);
-      log('送信: ' + input.value);
       input.value = '';
     }
 
