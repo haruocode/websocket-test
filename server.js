@@ -17,8 +17,8 @@ server.on('connection', (socket) => {
       socket.nickname = nickname || '名無し';
       console.log(`ニックネーム登録: ${socket.nickname}`);
 
-      // ★ここで入室メッセージを全員に送信！
       broadcast(`【入室】${socket.nickname}さんが入室しました`);
+      broadcastUserCount();
       return;
     }
 
@@ -27,9 +27,8 @@ server.on('connection', (socket) => {
 
   socket.on('close', () => {
     console.log(`クライアント切断: ${socket.nickname}`);
-
-    // ★切断したら退室メッセージを全員に送信！
     broadcast(`【退室】${socket.nickname}さんが退室しました`);
+    broadcastUserCount();
   });
 });
 
@@ -40,3 +39,10 @@ function broadcast(message) {
     }
   });
 }
+
+function broadcastUserCount() {
+  const count = [...server.clients].filter(c => c.readyState === WebSocket.OPEN).length;
+  broadcast(`🧑‍🤝‍🧑 現在の接続人数：${count}人`);
+}
+
+console.log('WebSocketサーバー起動中 (ポート8080)');
