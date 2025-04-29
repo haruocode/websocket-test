@@ -8,7 +8,13 @@ server.on('connection', (socket) => {
 
   socket.on('message', (message) => {
     console.log('受信:', message.toString());
-    socket.send(`サーバーから返信: ${message}`);
+
+    // ここで全クライアントにブロードキャストする
+    server.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(`誰かが送信: ${message}`);
+      }
+    });
   });
 
   socket.on('close', () => {
