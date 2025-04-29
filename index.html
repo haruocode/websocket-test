@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocketテスト</title>
+</head>
+<body>
+  <h1>WebSocketテスト</h1>
+  <input id="messageInput" type="text" placeholder="メッセージ入力">
+  <button onclick="sendMessage()">送信</button>
+  <div id="log"></div>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:8080');
+
+    socket.addEventListener('open', () => {
+      log('サーバーに接続しました');
+    });
+
+    socket.addEventListener('message', (event) => {
+      log('受信: ' + event.data);
+    });
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      socket.send(input.value);
+      log('送信: ' + input.value);
+      input.value = '';
+    }
+
+    function log(message) {
+      const logDiv = document.getElementById('log');
+      const p = document.createElement('p');
+      p.textContent = message;
+      logDiv.appendChild(p);
+    }
+  </script>
+</body>
+</html>
